@@ -1,7 +1,7 @@
 module WhittakerCoulomb
 
   using HypergeometricFunctions: _₁F₁ as F11, U
-  using SpecialFunctions: loggamma
+  using SpecialFunctions: gamma
 
   export ν
   export W, dW, dlogW
@@ -20,8 +20,8 @@ module WhittakerCoulomb
     return (Z*sqrt(μred))/sqrt(-2E)
   end
 
-  @inline function _logPrefactor(ν::Real, l::Int)
-    return 0.5*log(ν) - 0.5*(loggamma(ν + l + 1) + loggamma(ν - l))
+  @inline function _prefactor(ν::Real, l::Int)
+    return ν^0.5 / sqrt(gamma(ν+l+1)*gamma(ν-l))
   end
 
   ####################################################################
@@ -110,7 +110,7 @@ module WhittakerCoulomb
 
   ####################################################################
   """
-      coulW
+      coulW(r, ν, l; Z, μred)
 
   Standard unnormalized Coulomb-Whittaker decaying solution for ε < 0
 
@@ -130,7 +130,7 @@ module WhittakerCoulomb
 
   ####################################################################
   """
-      dcoulW
+      dcoulW(r, ν, l; Z, μred)
 
   Derivative of the standard unnormalized Coulomb-Whittaker decaying solution for ε < 0
 
@@ -145,7 +145,7 @@ module WhittakerCoulomb
 
   ####################################################################
   """
-      coulM
+      coulM(r, ν, l; Z, μred)
 
   Standard unnormalized Coulomb-Whittaker increasing solution for ε < 0
 
@@ -165,7 +165,7 @@ module WhittakerCoulomb
 
   ####################################################################
   """
-      dcoulM
+      dcoulM(r, ν, l; Z, μred)
 
   Derivative of the standard unnormalized Coulomb-Whittaker increasing solution for ε < 0
 
@@ -185,8 +185,7 @@ module WhittakerCoulomb
   Energy normalized decaying Coulomb-Whittaker function W(r,ν,l); 2.53 in Aymar, Greene, Luc-Koeing (1996)
   """
   function coulW_EN(r, ν::Real, l::Int; Z :: Real = 1.0, μred :: Real = 1.0)
-    logpref = _logPrefactor(ν, l)
-    pref = exp(logpref)
+    pref = _prefactor(ν, l)
     return pref * coulW(r, ν, l; Z = Z, μred = μred)
   end
 
@@ -196,8 +195,7 @@ module WhittakerCoulomb
   Derivative of the energy normalized decaying Coulomb-Whittaker function W(r,ν,l)
   """
   function dcoulW_EN(r, ν::Real, l::Int; Z :: Real = 1.0, μred :: Real = 1.0)
-    logpref = _logPrefactor(ν, l)
-    pref = exp(logpref)
+    pref = _prefactor(ν, l)
     return pref * dcoulW(r, ν, l; Z = Z, μred = μred)
   end
 
@@ -208,8 +206,7 @@ module WhittakerCoulomb
   Energy normalized increasing Coulomb-Whittaker function M(r,ν,l)
   """
   function coulM_EN(r, ν::Real, l::Int; Z::Real=1.0, μred :: Real = 1.0)
-    logpref = _logPrefactor(ν, l)
-    pref = exp(logpref)
+    pref = _prefactor(ν, l)
     return pref * coulM(r, ν, l; Z = Z, μred = μred)
   end
 
@@ -219,8 +216,7 @@ module WhittakerCoulomb
   Derivative of the energy normalized decaying Coulomb-Whittaker function M(r,ν,l)
   """
   function dcoulM_EN(r, ν::Real, l::Int; Z::Real=1.0, μred :: Real = 1.0)
-    logpref = _logPrefactor(ν, l)
-    pref = exp(logpref)
+    pref = _prefacto(ν, l)r
     return pref * dcoulM(r, ν, l; Z = Z, μred = μred)
   end
 
