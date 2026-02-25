@@ -4,9 +4,11 @@ version = "0.1.0"
 authors = ["banana-bred <j.forer@posteo.net>"]
 
 [deps]
+CoulombFunctions = "a1073327-32f2-4398-bd61-1b686fd668f2"
 HypergeometricFunctions = "34004b35-14d8-5ef3-9330-4cdb6864b03a"
 SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 
 [compat]
+CoulombFunctions = "0.1.0"
 HypergeometricFunctions = "0.3.28"
 SpecialFunctions = "2.7.1"
