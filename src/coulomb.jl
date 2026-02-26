@@ -1,3 +1,49 @@
+#########################################
+############### HELPERS #################
+#########################################
+"ν = Z * sqrt(μred)/sqrt(-2E)"
+function _ν(E; Z :: Real = 1.0, μred :: Real = 1.0)
+  @assert E<0 "ν(E) requries E < 0"
+  return (Z*sqrt(μred))/sqrt(-2E)
+end
+
+@inline function _prefactor_EN(ν::Real, l::Int)
+  logabs, phase = _logprefactor_EN(ν, l)
+  return exp(logabs)*phase
+end
+
+@inline function _logprefactor_EN(ν :: Real, l::Int)
+
+  @assert ν > 0 "ν must be > 0"
+  x1 = ν + l + 1
+  x2 = ν - l
+
+  # -- x2=ν-l will take us into the territory of poles in Γ
+  if x2 <= 0 && x2 == round(x2)
+    throw(DomainError(x2, "Γ(ν-1) has poles at nonpositive integers"))
+  end
+
+  logabs1, sgn1 = logabsgamma(x1)
+  logabs2, sgn2 = logabsgamma(x2)
+
+  # -- log( |ν / (Γ(x1) * Γ(x2))| ); already asserted ν=|ν| because real and positive
+  logabs_dtmp = log(ν) - (logabs1 + logabs2)
+  logabs_Enorm = 0.5*logabs_dtmp
+  phase = (sgn1*sgn2 > 0) ? 1.0 + 0.0im : im
+
+  return logabs_Enorm, phase
+
+end
+
+"The function A(ε,l) = Π_{n=0}^l (1+n²ε) from Seaton (2002)"
+@inline _seatonA(ε,l) = prod(1+n^2*ε for n in 0:l)
+
+"The function B(ε,l) (113) from Seaton (2002)"
+@inline _seatonB(ε,l) = ε <=0 ? A(ε,l) : A(ε,l) / ( 1-exp(-2π/sqrt(ε)) )
+
+"The function H(ε,l) = ε≤0 ? 0 : 1/( exp(2π/k) - 1 ) from Seaton (2002); k=sqrt(ε)"
+@inline _seatonH(ε) = ε≤0 ? 0 : 1/( exp(2π/sqrt(ε)) - 1 )
+
 ####################################################################
 """
     σ(η, l::Int)
@@ -23,15 +69,11 @@ end
     coulW(r, ν, l; Z, μred)
 
 Standard unnormalized Coulomb-Whittaker decaying solution for ε < 0
-in terms of Coulomb functions
 """
 function coulW(r, ν :: Real, l :: Int; Z :: Real = 1.0, μred :: Real = 1.0)
-  κ = (Z*μred)/ν
-  k = κ*im
-  ρ = k*r
-  η = ν*im
-  F, Fp, G, Gp = coulombs(ρ, η, l:l)
-  return G[1]*ctemp(η, l)
+  μ = l + 0.5
+  z = 2Z*μred * r/ν
+  return W(ν, μ, z)
 end
 
 ####################################################################
@@ -39,15 +81,12 @@ end
     dcoulW(r, ν, l; Z, μred)
 
 Derivative of the standard unnormalized Coulomb-Whittaker decaying solution for ε < 0
-in terms of the Coulomb functions
 """
 function dcoulW(r, ν :: Real, l :: Int; Z :: Real = 1.0, μred :: Real = 1.0)
-  κ = (Z*μred)/ν
-  k = κ*im
-  ρ = k*r
-  η = ν*im
-  F, Fp, G, Gp = coulombs(ρ, η, l:l)
-  return Gp[1]*ctemp(η, l) * k
+  μ = l + 0.5
+  dzdr = 2Z*μred/ν
+  z = dzdr*r
+  return dzdr * dW(ν, μ, z)
 end
 
 ####################################################################
@@ -55,15 +94,12 @@ end
     dlogcoulW(r, ν, l; Z, μred)
 
 Logarithmic derivative of the standard unnormalized Coulomb-Whittaker decaying solution for ε < 0
-in terms of the Coulomb functions
 """
 function dlogcoulW(r, ν :: Real, l :: Int; Z :: Real = 1.0, μred :: Real = 1.0)
-  κ = (Z*μred)/ν
-  k = κ*im
-  ρ = k*r
-  η = ν*im
-  F, Fp, G, Gp = coulombs(ρ, η, l:l)
-  return Gp[1]*k/G[1]
+  μ = l + 0.5
+  dzdr = 2Z*μred/ν
+  z = dzdr*r
+  return dzdr * dlogW(ν, μ, z)
 end
 
 ####################################################################
@@ -74,12 +110,9 @@ Standard unnormalized Coulomb-Whittaker increasing solution for ε < 0
 in terms of Coulomb functions
 """
 function coulM(r, ν :: Real, l :: Int; Z :: Real = 1.0, μred :: Real = 1.0)
-  κ = (Z*μred)/ν
-  k = κ*im
-  ρ = k*r
-  η = ν*im
-  F, Fp, G, Gp = coulombs(ρ, η, l:l)
-  return F[1]*ctemp(η, l)
+  μ = l + 0.5
+  z = 2Z*μred*r/ν
+  return M(ν, μ, z)
 end
 
 ####################################################################
@@ -90,12 +123,10 @@ Derivative of the standard unnormalized Coulomb-Whittaker increasing solution fo
 in terms of the Coulomb functions
 """
 function dcoulM(r, ν :: Real, l :: Int; Z :: Real = 1.0, μred :: Real = 1.0)
-  κ = (Z*μred)/ν
-  k = κ*im
-  ρ = k*r
-  η = ν*im
-  F, Fp, G, Gp = coulombs(ρ, η, l:l)
-  return Fp[1]*ctemp(η, l) * k
+  μ = l + 0.5
+  dzdr = 2Z*μred/ν
+  z = dzdr * r
+  return dzdr * dM(ν, μ, z)
 end
 
 ####################################################################
@@ -106,12 +137,10 @@ Logarithmic derivative of the standard unnormalized Coulomb-Whittaker increasing
 in terms of the Coulomb functions
 """
 function dlogcoulM(r, ν :: Real, l :: Int; Z :: Real = 1.0, μred :: Real = 1.0)
-  κ = (Z*μred)/ν
-  k = κ*im
-  ρ = k*r
-  η = ν*im
-  F, Fp, G, Gp = coulombs(ρ, η, l:l)
-  return Fp[1]*k/F[1]
+  μ = l + 0.5
+  dzdr = 2Z*μred/ν
+  z = dzdr * r
+  return dzdr * dlogM(ν, μ, z)
 end
 
 ####################################################################
@@ -121,7 +150,7 @@ end
 Energy normalized decaying Coulomb-Whittaker function W(r,ν,l); 2.53 in Aymar, Greene, Luc-Koeing (1996)
 """
 function coulW_EN(r, ν::Real, l::Int; Z :: Real = 1.0, μred :: Real = 1.0)
-  pref = _prefactor(ν, l)
+  pref = _prefactor_EN(ν, l)
   return pref * coulW(r, ν, l; Z = Z, μred = μred)
 end
 
@@ -131,7 +160,7 @@ end
 Derivative of the energy normalized decaying Coulomb-Whittaker function W(r,ν,l)
 """
 function dcoulW_EN(r, ν::Real, l::Int; Z :: Real = 1.0, μred :: Real = 1.0)
-  pref = _prefactor(ν, l)
+  pref = _prefactor_EN(ν, l)
   return pref * dcoulW(r, ν, l; Z = Z, μred = μred)
 end
 
@@ -142,7 +171,7 @@ end
 Energy normalized increasing Coulomb-Whittaker function M(r,ν,l)
 """
 function coulM_EN(r, ν::Real, l::Int; Z::Real=1.0, μred :: Real = 1.0)
-  pref = _prefactor(ν, l)
+  pref = _prefactor_EN(ν, l)
   return pref * coulM(r, ν, l; Z = Z, μred = μred)
 end
 
@@ -152,7 +181,7 @@ end
 Derivative of the energy normalized decaying Coulomb-Whittaker function M(r,ν,l)
 """
 function dcoulM_EN(r, ν::Real, l::Int; Z::Real=1.0, μred :: Real = 1.0)
-  pref = _prefacto(ν, l)r
+  pref = _prefactor_EN(ν, l)
   return pref * dcoulM(r, ν, l; Z = Z, μred = μred)
 end
 
@@ -222,7 +251,7 @@ function seatonh(ε, l, r)
   λ=l+0.5
   z=2r/κ
   return gamma(l+1-κ)/(π*κ^l) * W(κ,λ,z) +
-  [im*_seatonH(ε) + cot(π*κ)] * _seatonA(ε,l)*seatonf(ε,l,r)
+  (im*_seatonH(ε) + cot(π*κ)) * _seatonA(ε,l)*seatonf(ε,l,r)
 end
 
 ####################################################################

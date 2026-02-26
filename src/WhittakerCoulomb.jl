@@ -2,15 +2,15 @@ module WhittakerCoulomb
 
   using HypergeometricFunctions: _₁F₁ as F11, U
   using CoulombFunctions: coulombs
-  using SpecialFunctions: gamma
+  using SpecialFunctions: gamma, logabsgamma
 
-  export ν
-  export W, dW, dlogW
+  # export ν
   export M, dM, dlogM
-  export coulW,    dcoulW
-  export coulW_EN, dcoulW_EN
-  export coulM,    dcoulM
+  export W, dW, dlogW
+  export coulM,    dcoulM, dlogcoulM
+  export coulW,    dcoulW, dlogcoulW
   export coulM_EN, dcoulM_EN
+  export coulW_EN, dcoulW_EN
   export seatony
   export seatonf, dseatonf
   export seatonh, dseatonh
