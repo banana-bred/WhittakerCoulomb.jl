@@ -17,6 +17,7 @@ module WhittakerCoulomb
 
 
   include("helpers.jl")
+  include("whittaker_ode.jl")
   include("whittaker.jl")
   include("coulomb.jl")
 
