@@ -4,6 +4,7 @@ module WhittakerCoulomb
   using CoulombFunctions: coulombs
   using SpecialFunctions: gamma, logabsgamma, loggamma
   using DifferentialEquations
+  using StaticArrays
 
   # export ν
   export M, dM, dlogM

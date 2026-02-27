@@ -95,11 +95,11 @@ function _W_solve_ODE(κ, μ, z; z0=nothing, Nasymp = 60, alg=Rodas5P(), reltol=
   @assert z0 > z "Asymptotic limit ($(z0)) cannot be smaller than the target value ($(z))"
 
   # -- asymptotic solutions
-  u0, up0 = _asymptotic_initializer(κ, μ, z0; Nasymp=Nasymp)
+  u0, up0 = T.( _asymptotic_initializer(κ, μ, z0; Nasymp=Nasymp) )
 
   # -- solve down to z
-  u0up0 = T[u0, up0]
-  prob = ODEProblem(_scaled_whittaker_W_RHS!, u0up0, (z0, z), (κ, μ))
+  uup = SA[u0, up0]
+  prob = ODEProblem(_scaled_whittaker_W_RHS!, uup, (z0, z), (κ, μ))
 
   sol = solve(prob, alg; reltol=reltol, abstol=abstol)
   u, up = sol.u[end]

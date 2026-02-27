@@ -9,6 +9,7 @@ DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
 HypergeometricFunctions = "34004b35-14d8-5ef3-9330-4cdb6864b03a"
 Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
 SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
+StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [compat]
 CoulombFunctions = "0.1.0"
@@ -16,3 +17,4 @@ DifferentialEquations = "7.17.0"
 HypergeometricFunctions = "0.3.28"
 Revise = "3.13.2"
 SpecialFunctions = "2.7.1"
+StaticArrays = "1.9.17"

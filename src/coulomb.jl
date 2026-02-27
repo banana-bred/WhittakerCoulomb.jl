@@ -46,21 +46,21 @@ end
 
 ####################################################################
 """
-    σ(η, l::Int)
+    _σl(η, l::Int)
 
-Coulomb phase shift
+Coulomb phase shift:
 
     σ_l = (logΓ(l+1 - iη) - logΓ(l+1 + iη)) * i;2
 
 or its analytic continuation
 """
-@inline function σl(η, l::Int)
+@inline function _σl(η, l::Int)
   lp1 = l+1
   return ( loggamma(lp1 - im*η) - loggamma(lp1 + im*η) ) * im/2
 end
 
 @inline function ctemp(η, l::Int)
-  σ = σl(η, l)
+  σ = _σl(η, l)
   return exp((π/2) * (im*l - η) - im *σ)
 end
 
@@ -274,67 +274,3 @@ function dseatonh(ε, l, r)
   end
   return ((1+l^2*ε)*h(l-1) - (l^2/r-1)*h(l)) / l
 end
-
-# ####################################################################
-# """
-#     coulM_alt(r, ν, l; Z)
-
-# Alternate normalization of the increasing Coulomb-Whittaker function M(r,ν,l) where
-
-#     2M(r,ν,l; Z) = f/sin(β) + h/cos(β)
-
-# where β=π(ν-l)
-# """
-# function coulM_alt(r, E::Real, l::Int; Z::Real=1.0, μred :: Real = 1.0)
-#   β = π*(v(E,Z=Z,μred=μred)-l)
-#   ε = 2E
-#   return seatonf(ε,l,r)/sin(β) + seatonh(ε,l,r)/cos(β)
-# end
-
-# ####################################################################
-# """
-#     dcoulM_alt(r, ν, l; Z)
-
-# Derivative of the alternate normalization of the increasing Coulomb-Whittaker function M(r,ν,l) where
-
-#     2M(r,ν,l; Z) = f/sin(β) + h/cos(β)
-
-# where β=π(ν-l)
-# """
-# function dcoulM_alt(r, E::Real, l::Int; Z::Real=1.0, μred :: Real = 1.0)
-#   β = π*(v(E,Z=Z,μred=μred)-l)
-#   ε = 2E
-#   return dseatonf(ε,l,r)/sin(β) + dseatonh(ε,l,r)/cos(β)
-# end
-
-# ####################################################################
-# """
-#     coulW_alt(r, ν, l; Z)
-
-# Alternate normalization of the decreasing Coulomb-Whittaker function W(r,ν,l) where
-
-#     2W(r,ν,l; Z) = - f/cos(β) + h/sin(β)
-
-# where β=π(ν-l)
-# """
-# function coulM_alt(r, E::Real, l::Int; Z::Real=1.0, μred :: Real = 1.0)
-#   β = π*(v(E,Z=Z,μred=μred)-l)
-#   ε = 2E
-#   return -seatonf(ε,l,r)/cos(β) + seatonh(ε,l,r)/sin(β)
-# end
-
-# ####################################################################
-# """
-#     coulW_alt(r, ν, l; Z)
-
-# Derivative of the alternately normlzed decreasing Coulomb-Whittaker function W(r,ν,l) where
-
-#     2W(r,ν,l; Z) = - f/cos(β) + h/sin(β)
-
-# where β=π(ν-l)
-# """
-# function dcoulM_alt(r, E::Real, l::Int; Z::Real=1.0, μred :: Real = 1.0)
-#   β = π*(v(E,Z=Z,μred=μred)-l)
-#   ε = 2E
-#   return -dseatonf(ε,l,r)/cos(β) + dseatonh(ε,l,r)/sin(β)
-# end

@@ -2,7 +2,7 @@
 
 julia_version = "1.12.4"
 manifest_format = "2.0"
-project_hash = "ad964f1c8ed24283d6ddf2d5c77c32f4495d7eee"
+project_hash = "1de8a775efaad3fb239772c971c5efa5343c6ce1"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "f7304359109c768cf32dc5fa2d371565bb63b68a"
@@ -2004,7 +2004,7 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 version = "1.11.0"
 
 [[deps.WhittakerCoulomb]]
-deps = ["CoulombFunctions", "HypergeometricFunctions", "Revise", "SpecialFunctions"]
+deps = ["CoulombFunctions", "DifferentialEquations", "HypergeometricFunctions", "Revise", "SpecialFunctions"]
 path = "."
 uuid = "a183c6a1-9880-467b-aa39-ddde75f7ab5d"
 version = "0.1.0"
