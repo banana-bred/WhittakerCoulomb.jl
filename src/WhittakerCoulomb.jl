@@ -2,7 +2,8 @@ module WhittakerCoulomb
 
   using HypergeometricFunctions: _₁F₁ as F11, U
   using CoulombFunctions: coulombs
-  using SpecialFunctions: gamma, logabsgamma
+  using SpecialFunctions: gamma, logabsgamma, loggamma
+  using DifferentialEquations
 
   # export ν
   export M, dM, dlogM

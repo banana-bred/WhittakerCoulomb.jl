@@ -18,7 +18,7 @@ Returns W, its derivative, and its log-derivative
 
 """
 function _W_all(κ, μ, z; z0=nothing, Nasymp :: Int = 40, hmax = 0.05)
-  _do_use_ode_W(κ, μ, z) && return _W_solve_ODE(κ, μ, z; z0=z0, Nasymp=Nasymp, hmax=hmax)
+  _do_use_ode_W(κ, μ, z) && return _W_solve_ODE(κ, μ, z; z0=z0, Nasymp=Nasymp)
 
   a = μ - κ + 0.5
   W0 = _W_U(κ, μ, z)
